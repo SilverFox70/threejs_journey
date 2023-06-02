@@ -4,7 +4,7 @@ console.log("Hello form the script file!");
 const canvas = document.querySelector("canvas.webgl");
 
 /*--------------------------------------------------------------
-  Create geemteries and add to scene
+  Create geometries and add to scene
 --------------------------------------------------------------*/
 const scene = new THREE.Scene();
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -14,7 +14,7 @@ const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
 scene.add(boxMesh);
 
 /*--------------------------------------------------------------
-  Set up 'sizees' and camera to view scene
+  Set up 'sizes' and camera to view scene
 --------------------------------------------------------------*/
 const sizes = {
   width: 800,
