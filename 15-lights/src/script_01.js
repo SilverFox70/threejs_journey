@@ -10,11 +10,16 @@ import gsap from "gsap";
 // Debug
 const gui = new dat.GUI();
 
+
 // Canvas
 const canvas = document.querySelector("canvas.webgl");
 
 // Scene
 const scene = new THREE.Scene();
+
+// Axes Helper
+const axesHelper = new THREE.AxesHelper()
+scene.add(axesHelper)
 
 /**
  * Lights
@@ -35,16 +40,27 @@ const material = new THREE.MeshStandardMaterial()
 material.roughness = 0.4
 
 // Geometries
-
+/*---------------------------------------------------------
+  TODO:
+  Convert the for...loop into a function that will accept
+  a Mesh, #rows, #cols, anchor point (v3), gridGap and 
+  using Mesh.geometry.parameters height and width, return
+  a flat array of Mesh objects whose positions fill in 
+  the specified grid.
+---------------------------------------------------------*/
 
 const planeGeometry = new THREE.PlaneGeometry(0.1, 0.1);
 material.color = new THREE.Color(0xadefff);
 
 const planes = [];
-
+const cellWidth = 0.1;
+let p = 0;
+let n = 0;
 // Make grid of planes
-for (let i = -1; i < 1; i+=0.1) {
-  for (let j = -1; j < 1; j+=0.1) {
+for (let i = -0.9; i < 1; i+=cellWidth) {
+  p++;
+  for (let j = -0.9; j < 1; j+=cellWidth) {
+    if (p === 1) n++;
     // Object
     const plane = new THREE.Mesh(
       planeGeometry,
@@ -52,12 +68,14 @@ for (let i = -1; i < 1; i+=0.1) {
     );
   
     // Position
-    plane.position.set(i, j, 0);
+    plane.position.set(i - (cellWidth/2), j - (cellWidth/2), 0);
     planes.push(plane)
     
   }
 }
 
+console.log("planes:" , planes);
+console.log(`n: ${n}, p: ${p}`);
 // Add to scene
 scene.add(...planes);
 
@@ -70,13 +88,13 @@ document.addEventListener("click", function() {
   // Create rotation wrappers and animate them
   const rotations = planes.map(plane => ({ rotationY: plane.rotation.y, rotationX: plane.rotation.x }));
   gsap.to(rotations, {
-    duration: 0.5,
+    duration: 1,
     rotationY: flip ? Math.PI : 0,
-    // rotationX: flip ? Math.PI : 0,
+    // rotationX: flip ? Math.PI/4 : 0,
     ease: "power2.inOut",
     stagger: {
-      grid: [10, 10],
-      from: "random",
+      grid: [20, 20],
+      from: flip ? "center" : "edges",
       // axis: "xy",
       each: 0.02 // Adjust this value for more/less staggering
     },
