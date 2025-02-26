@@ -20,9 +20,63 @@ const scene = new THREE.Scene();
  * Models
  */
 
+let mixer = null;
 const gltfLoader = new GLTFLoader();
+gltfLoader.load(
+  "/models/Fox/glTF/Fox.gltf",
+  (gltf) => {
+    console.log("success", gltf);
+
+    mixer = new THREE.AnimationMixer(gltf.scene);
+    const action = mixer.clipAction(gltf.animations[0]);
+    action.play();
+
+    gltf.scene.scale.set(0.025, 0.025, 0.025);
+    scene.add(gltf.scene);
+  },
+  (progress) => {
+    console.log("progress");
+    console.log(progress);
+  },
+  (error) => {
+    console.log("error");
+    console.log(error);
+  }
+);
+
+// Loading complex models with many meshes
+// const gltfLoader = new GLTFLoader();
 // gltfLoader.load(
-//   "/models/Duck/glTF/Duck.gltf",
+//   "/models/FlightHelmet/glTF/FlightHelmet.gltf",
+//   (gltf) => {
+//     console.log("success", gltf);
+
+//     // to add individual elements of the scene
+//     const children = [...gltf.scene.children];
+//     for (const child of children) {
+//       scene.add(child);
+//     }
+
+//     // to add the whole scene at once
+//     // scene.add(gltf.scene);
+//   },
+//   (progress) => {
+//     console.log("progress");
+//     console.log(progress);
+//   },
+//   (error) => {
+//     console.log("error");
+//     console.log(error);
+//   }
+// );
+
+// Using DRACO compressed version
+// const dracoLoader = new DRACOLoader();
+// dracoLoader.setDecoderPath("/draco/");
+
+// gltfLoader.setDRACOLoader(dracoLoader);
+// gltfLoader.load(
+//   "/models/Duck/glTF-Draco/Duck.gltf",
 //   (gltf) => {
 //     console.log("success", gltf);
 //     scene.add(gltf.scene.children[0]);
@@ -36,26 +90,6 @@ const gltfLoader = new GLTFLoader();
 //     console.log(error);
 //   }
 // );
-
-const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath("/draco/");
-
-gltfLoader.setDRACOLoader(dracoLoader);
-gltfLoader.load(
-  "/models/Duck/glTF/Duck.gltf",
-  (gltf) => {
-    console.log("success", gltf);
-    scene.add(gltf.scene.children[0]);
-  },
-  (progress) => {
-    console.log("progress");
-    console.log(progress);
-  },
-  (error) => {
-    console.log("error");
-    console.log(error);
-  }
-);
 
 /**
  * Floor
@@ -150,6 +184,11 @@ const tick = () => {
   const elapsedTime = clock.getElapsedTime();
   const deltaTime = elapsedTime - previousTime;
   previousTime = elapsedTime;
+
+  // Update mixer
+  if (mixer !== null) {
+    mixer.update(deltaTime);
+  }
 
   // Update controls
   controls.update();
